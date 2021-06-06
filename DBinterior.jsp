@@ -1,0 +1,43 @@
+<%-- 
+    Document   : DBinterior
+    Created on : Apr 26, 2021, 4:41:38 PM
+    Author     : Amir
+--%>
+
+<%@page import="javax.sql.rowset.CachedRowSet"%>
+<%@page import="javax.sql.rowset.RowSetProvider"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    CachedRowSet crs = RowSetProvider.newFactory().createCachedRowSet();
+    crs.setUrl("jdbc:derby://localhost:1527/ProjectAMG");
+    crs.setUsername("AMG");
+    crs.setPassword("AMG");
+    crs.setCommand("Select id from CarList where id = ?");
+    crs.setString(1, pageContext.getSession().getId());
+    crs.execute();
+    if (crs.next()) {
+        crs.setCommand("update CarList set upholstery = ?, trimcolor = ? where id = ?");
+        crs.setString(1, request.getParameter("radioSeats"));
+        crs.setString(2, request.getParameter("radioTrim"));
+        crs.setString(3, pageContext.getSession().getId());
+        crs.execute();
+    } else {
+        crs.setCommand("INSERT into CarList (id, upholstery, trimcolor) values(?,?,?)");
+        crs.setString(1, pageContext.getSession().getId());
+        crs.setString(2, request.getParameter("radioSeats"));
+        crs.setString(3, request.getParameter("radioTrim"));
+        crs.execute();
+    }
+%>
+<jsp:forward page="options.html"></jsp:forward><!DOCTYPE html>
+<%--
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <h1><%= pageContext.getSession().getId() %> </h1>
+    </body>
+</html>
+--%>
